@@ -1,8 +1,13 @@
 const mongoose=require('mongoose');
-mongoose.connect("mongodb://127.0.0.1:27017/scatch");
+//according to industry standards we don't give connection here we gave it to config or utilities folder in seperate file only for connection 
+//mongoose.connect("mongodb://127.0.0.1:27017/scatch");
 
 const userSchema=mongoose.Schema({
-    fullname:String,
+    fullname:{
+        type:String,
+        minLength:3,
+        trim:true,
+    },
     email:String,
     password:String,
     cart:{
