@@ -30,7 +30,10 @@ if(process.env.NODE_ENV=="development"){//env stands for environment ,we are sto
     })
 }
 
+router.get('/admin',(req,res)=>{
+    let success=req.flash("success")//what ever value we get after creating a product
+    res.render('createproduct.ejs',{success});
 
-
+})
 
 module.exports=router;

@@ -7,7 +7,10 @@ module.exports.registerUser=async(req,res)=>{
     try{
         let{fullname,email,password}=req.body
         let existingUser=await userModel.findOne({email:email});
-        if(existingUser) return res.status(401).send("You already have an account");
+        if(existingUser) {
+            req.flash("error","you already have an account")
+            return res.redirect("/");
+        }
          
         bcrypt.genSalt(10,(err,salt)=>{
             bcrypt.hash(password,salt,async(err,hash)=>{
@@ -17,11 +20,12 @@ module.exports.registerUser=async(req,res)=>{
                     password:hash,
                     fullname,
                 })
-                res.send(user);
+                //res.send(user);
                 //const token=jwt.sign()
                 //we'll be writing token in dofferent file of utils(generateToken.js)
                 let token=generateToken(user);
                 res.cookie("token",token);
+                res.redirect('/shop')
             })
         })
         
@@ -31,4 +35,36 @@ module.exports.registerUser=async(req,res)=>{
         console.log(err.message);
         
     }
+}
+
+
+module.exports.loginUser=async(req,res)=>{
+    let{email,password}=req.body;
+    let user=await userModel.findOne({email:email});
+    if(!user) {
+        req.flash("error","user doesn't exist")
+        return res.redirect("/");
+    }
+
+    bcrypt.compare(password,user.password,(err,result)=>{
+        if(result){
+            let token=generateToken(user);
+            res.cookie("token",token);
+            res.redirect('/shop')
+        }
+        else{
+            req.flash("error","Incorrect email or password");
+            return res.redirect("/");
+        
+        }
+    })
+
+    
+}
+
+//creating isLoggedIn middleware also protected route so that user joh logged In nhi h woh glti seh woh pages na khol le joh usse nhi khoolne chahiye the...that's why we need isLoggedIn middleare ....it will be created in middleware folder
+
+module.exports.logout=(req,res)=>{
+    res.cookie("token","");
+    res.redirect('/');
 }
