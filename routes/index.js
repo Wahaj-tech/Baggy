@@ -6,7 +6,7 @@ const productModel = require('../models/product-model');
 router.get('/',(req,res)=>{
     //hmne isLoggedIn seh flash send kiya tha on any error on this route so we have req.flash("error","any message send");
     let error=req.flash("error");//message inside error name will saved in error variable
-    res.render('index',{error});
+    res.render('index',{error,loggedin:false});//when there is no user we don't want to show myAccount and logout links so we will send Loogedin:false variable to index.ejs file
 })
 
 router.get('/shop',isLoggedIn,async(req,res)=>{
@@ -14,7 +14,5 @@ router.get('/shop',isLoggedIn,async(req,res)=>{
 
     res.render('shop',{products});
 })
-router.get('/logout',isLoggedIn,(req,res)=>{
-    res.render("shop");
-})
+
 module.exports=router;

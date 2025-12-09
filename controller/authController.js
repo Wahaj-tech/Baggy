@@ -2,10 +2,34 @@ const userModel=require('../models/user-model');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken')
 const {generateToken}=require('../utils/generateToken')//bringing generateToken from generateToken.js file
+const Joi = require('joi'); // Import Joi for input validation
+
+
+// Schema for validating registration input
+const registerSchema = Joi.object({
+    fullname: Joi.string().min(3).max(100).required(), // fullname: 3-100 chars, required
+    email: Joi.string().email().required(), // email: valid email format, required
+    password: Joi.string().min(6).required() // password: min 6 chars, required
+});
+
+// Schema for validating login input
+const loginSchema = Joi.object({
+    email: Joi.string().email().required(), // email: valid email format, required
+    password: Joi.string().min(4).required() // password: min 6 chars, required
+});
+
 
 module.exports.registerUser=async(req,res)=>{
     try{
         let{fullname,email,password}=req.body
+        // Validate registration input using Joi schema
+        const {error: regError} = registerSchema.validate({ fullname, email, password }, { abortEarly: false });
+        if (regError) {
+            // If validation failed, extract error messages and send back
+            const messages = regError.details.map(d => d.message);
+            req.flash("error",messages.join(' | '))
+            return res.redirect("/");
+        }
         let existingUser=await userModel.findOne({email:email});
         if(existingUser) {
             req.flash("error","you already have an account")
@@ -39,7 +63,16 @@ module.exports.registerUser=async(req,res)=>{
 
 
 module.exports.loginUser=async(req,res)=>{
+
     let{email,password}=req.body;
+    // Validate login input using Joi schema
+        const { error: loginError } = loginSchema.validate({ email, password }, { abortEarly: false });
+        if (loginError) {
+            // If validation failed, extract error messages and send back
+            const messages = loginError.details.map(d => d.message);
+            req.flash("error",messages.join(' | '))
+            return res.redirect("/");
+        }
     let user=await userModel.findOne({email:email});
     if(!user) {
         req.flash("error","user doesn't exist")
