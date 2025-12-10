@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const{isLoggedIn}=require('../middleware/isLoggedIn');
+const userModel=require('../models/user-model')
 const productModel = require('../models/product-model');
 
 router.get('/',(req,res)=>{
@@ -11,8 +12,33 @@ router.get('/',(req,res)=>{
 
 router.get('/shop',isLoggedIn,async(req,res)=>{
     let products=await productModel.find();
-
-    res.render('shop',{products});
+    let success=req.flash("success")
+    res.render('shop',{products,success});
 })
-
+router.get('/cart',isLoggedIn,async(req,res)=>{
+    
+    try{
+        const user = await userModel.findById(req.user._id);
+        const product = await productModel.findById(req.params.productid);
+        if(!product) {
+            req.flash('error','Product not found');
+            return res.redirect('/shop');
+        }
+        // prevent duplicates
+        const exists = user.cart.some(id => id.toString() === product._id.toString());
+        if (exists) {
+            req.flash('success','Product already in cart');
+            return res.redirect('/shop');
+        }
+        user.cart.push(product._id);
+        await user.save();
+        req.flash("success","Product added to cart successfully");
+        return res.redirect('/shop');
+    }
+    catch(err){
+        console.log(err.message);
+        req.flash('error','Could not add to cart');
+        return res.redirect('/shop');
+    }
+})
 module.exports=router;
