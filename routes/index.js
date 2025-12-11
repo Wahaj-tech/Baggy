@@ -15,7 +15,36 @@ router.get('/shop',isLoggedIn,async(req,res)=>{
     let success=req.flash("success")
     res.render('shop',{products,success});
 })
-router.get('/cart',isLoggedIn,async(req,res)=>{
+
+router.get("/cart",isLoggedIn,async(req,res)=>{
+    let user = await userModel
+    .findOne({ email: req.user.email })
+    .populate('cart'); // cart = array of product objects
+
+    let total = 0;
+    user.cart.forEach(product => {
+        const discountAmount = product.price * (product.discount / 100);
+        const finalPrice = product.price - discountAmount;
+        total += finalPrice;
+    });
+    // add platform fee (20)
+    let totalAmount = total + 20;
+    res.render('cart', { user, totalAmount });
+
+})
+
+router.get('/addtocart/:productid',isLoggedIn,async(req,res)=>{
+    let user=await userModel.findOne({email:req.user.email});
+    user.cart.push(req.params.productid);
+    await user.save();
+    req.flash("success","Product added to cart successfully");
+    res.redirect('/shop');
+
+});
+
+module.exports=router;
+
+/*router.get('/cart',isLoggedIn,async(req,res)=>{
     
     try{
         const user = await userModel.findById(req.user._id);
@@ -40,5 +69,4 @@ router.get('/cart',isLoggedIn,async(req,res)=>{
         req.flash('error','Could not add to cart');
         return res.redirect('/shop');
     }
-})
-module.exports=router;
+}) */
