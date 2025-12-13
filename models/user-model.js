@@ -10,6 +10,11 @@ const userSchema=mongoose.Schema({
     },
     email:String,
     password:String,
+    googleId: {       // NEW: store Google user ID
+        type: String,
+        unique: true,
+        sparse: true, // allows multiple users without googleId
+    },
     cart:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'product'//yaha humne product-model na likhke 'product' likha kyuki mongoose model ka naam product hai jo humne product-model.js file mein diya tha
