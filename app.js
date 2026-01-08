@@ -48,5 +48,7 @@ app.use("/users", usersRouter); //user seh related saari request bhej di jaaye u
 app.use("/products", productsRouter); //product seh related saari request bhej di jaaye productsRoute p
 const authRoutes = require("./routes/authRoutes");
 app.use("/auth", authRoutes);
-
+// app.get('/cors',(req,res)=>{
+//   return res.setHeader("Access-Control-Allow-Origin", "*").json({msg:"CORS policy working fine"});
+// })
 app.listen(3000);

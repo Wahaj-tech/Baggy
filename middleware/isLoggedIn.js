@@ -10,7 +10,7 @@ module.exports.isLoggedIn=async(req,res,next)=>{
     }
     try{
         let decoded=jwt.verify(req.cookies.token,process.env.JWT_KEY);//on decoding we get email and id of user as it is being sent while generating token through jwt.sign({email,id})
-
+         
         let user=await userModel
         .findOne({email:decoded.email})//user k saara data aajyega
         .select("-password");//it states that ,user k saarein data seh minus password ...not taking password from user

@@ -15,7 +15,7 @@ const config=require('config')
             //environment variable setting up syntax-->
             //set DEBUG=development:*  or $env:DEBUG = "development:*"     DEBUG is our environment variable jisme development seh related saarein namespace k messages show krna
             //if we want ki kuch bhi na print ho toh DEBUG=    blank chor do
-            //go to terminal type set DEBUG=development:* and enter then nodemon app.js u wil see development:mongoose mongoDB connected +0ms
+            //go to terminal type  $env:DEBUG="development:*" and enter then nodemon app.js u wil see development:mongoose mongoDB connected +0ms
             dbgr("mongoDB connected");
     })
     .catch((err)=>{
